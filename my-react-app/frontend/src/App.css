@@ -1,0 +1,162 @@
+/* General Styles */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #ffffff;
+  height: 100%; /* Ensure html and body take full height */
+  overflow: hidden; /* Prevent scrolling on the body */
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 0;
+}
+
+/* App Layout */
+.App {
+  display: flex;
+  height: 100vh; /* Ensure the app takes the full viewport height */
+}
+
+/* Navbar (Left Column) */
+.navbar {
+  width: 100%; /* Set to full width initially */
+  max-width: 250px; /* Cap the width to prevent it from being too wide */
+  background-color: #f1f1f1;
+  color: #000000;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0; /* Prevent the navbar from shrinking */
+  height: 100vh; /* Make it span the full height of the viewport */
+  position: fixed; /* Fix it to the left side of the screen */
+  top: 0;
+  left: 0;
+  overflow-y: auto; /* Add scroll if content overflows */
+}
+
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  color: #000000;
+  margin-bottom: 2rem;
+}
+
+.navbar .nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.navbar .nav-links li {
+  margin-bottom: 1rem;
+}
+
+.navbar .nav-links li a {
+  color: #000000;
+  text-decoration: none;
+  font-size: 1rem;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.navbar .nav-links li a:hover {
+  background-color: #444;
+}
+
+/* Home Button with Collapsible List */
+.nav-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.nav-item:hover {
+  background-color: #444;
+}
+
+.arrow {
+  font-size: 0.8rem;
+}
+
+.sub-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-left: 1rem; /* Indent sub-links */
+}
+
+.sub-links li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.sub-links li a:hover {
+  background-color: #555;
+}
+
+/* Main Content Area (Right Column) */
+.main-content {
+  margin-left: 250px; /* Adjust to the navbar's width */
+  flex: 1;
+  background-color: #59545F; /* Changed to light gray */
+  padding: 2rem;
+  height: 100vh; /* Make it take the full viewport height */
+  overflow-y: auto; /* Enable scrolling only if content overflows */
+}
+
+/* Hero Section Styles */
+.hero {
+  background-color: #f4f4f4;
+  padding: 5rem 0;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.hero .cta-button {
+  background-color: #333;
+  color: #fff;
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.hero .cta-button:hover {
+  background-color: #f4c10f;
+}
+
+/* Footer Styles */
+.footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 1rem 0;
+  width: 100%;
+}
+

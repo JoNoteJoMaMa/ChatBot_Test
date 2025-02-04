@@ -112,7 +112,6 @@ html, body {
 
 /* Main Content Area (Right Column) */
 .main-content {
-  margin-left: 250px; /* Adjust to the navbar's width */
   flex: 1;
   background-color: #59545F; /* Changed to light gray */
   padding: 2rem;
@@ -158,5 +157,37 @@ html, body {
   text-align: center;
   padding: 1rem 0;
   width: 100%;
+}
+
+/* App.css */
+.user-info {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: auto; /* Push to the bottom of the navbar */
+  padding: 1rem;
+  border-top: 1px solid #444; /* Add a separator */
+  text-align: center;
+}
+
+.user-info p {
+  margin: 0;
+  color: #000000;
+  font-size: 0.9rem;
+}
+
+.user-info button {
+  
+  padding: 0.5rem 1rem;
+  background-color: #ff4d4d; /* Red color for logout button */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.user-info button:hover {
+  background-color: #cc0000; /* Darker red on hover */
 }
 

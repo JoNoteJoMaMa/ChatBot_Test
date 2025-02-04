@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from "react";
+import { auth } from "../firebase";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { db } from "../firebase";
+import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import "./Home.css"; // Import a CSS file for styling
+import { extractImageAndText, isImageUrlDetect } from "../extractImgLink";
+import "./Home.css";
 
-function Home() {
-  const [sessionId] = useState("AAAAA"); // Example session ID
+function Home({ userName })  {
+  const [sessionId, setSessionId] = useState(""); // Store session ID
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [isSessionStored, setIsSessionStored] = useState(false); // Ensure we update Firestore only once
 
-  // Typing animation effect
+  // Generate sessionId & Update URL when user enters `/` page
+  useEffect(() => {
+    let existingSessionId = new URLSearchParams(window.location.search).get("sessionId");
+
+   
+      existingSessionId = uuidv4();
+      window.history.replaceState({}, "", `/?sessionId=${existingSessionId}`); // Update URL without reloading
+
+    setSessionId(existingSessionId);
+  }, []);
+
   useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
@@ -19,29 +35,49 @@ function Home() {
     }
   }, [loading]);
 
+  // Function to store sessionId in Firestore (called only when user starts chat)
+  const storeSessionInDB = async () => {
+    if (isSessionStored || !auth.currentUser) return;
+
+    try {
+      const userRef = doc(db, "Users", auth.currentUser.uid);
+      await updateDoc(userRef, {
+        sID: arrayUnion(sessionId),
+      });
+      console.log("Session ID stored successfully!");
+      setIsSessionStored(true); // Prevent duplicate updates
+    } catch (error) {
+      console.error("Error storing session ID:", error);
+    }
+  };
+
   const handleChatSubmit = async () => {
-    if (!chatInput.trim()) return; // Prevent empty messages
+    if (!chatInput.trim()) return;
 
     setLoading(true);
     const userMessage = { sender: "user", text: chatInput };
     setChatMessages((prevMessages) => [...prevMessages, userMessage]);
 
-    // Add a temporary "typing..." message from the bot
-    const loadingMessage = { sender: "bot", text: "กำลังคิด" };
-    setChatMessages((prevMessages) => [...prevMessages, loadingMessage]);
+    setChatMessages((prevMessages) => [...prevMessages, { sender: "bot", text: "กำลังคิด" }]);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/chatbot", {
+      // **Store session ID in Firestore ONLY if the user starts a chat**
+      await storeSessionInDB();
+
+      const response = await axios.post("http://209.15.111.1:5678/webhook/n8n_Sale2012", {
         sessionId,
         chatInput,
       });
 
-      // Replace the "Typing..." message with actual response
+      const { imageUrl, description } = extractImageAndText(response.data.message);
+
+      const botMessage = isImageUrlDetect(response.data.message)
+        ? { sender: "bot", text: description, imageUrl }
+        : { sender: "bot", text: response.data.message };
+
       setChatMessages((prevMessages) =>
         prevMessages.map((msg, index) =>
-          index === prevMessages.length - 1
-            ? { sender: "bot", text: response.data.message }
-            : msg
+          index === prevMessages.length - 1 ? botMessage : msg
         )
       );
     } catch (error) {
@@ -64,9 +100,33 @@ function Home() {
       <div className="chat-window">
         {chatMessages.map((message, index) => (
           <div key={index} className={`chat-message ${message.sender}`}>
-            <strong>{message.sender === "user" ? "You:" : "Bot:"}</strong>{" "}
-            {message.text}
-            {loading && index === chatMessages.length - 1 && ".".repeat(loadingMessageIndex + 1)}
+            <strong>{message.sender === "user" ? userName+":" : "Bot:"}</strong>
+            {message.sender === "bot" && message.imageUrl ? (
+              <div>
+                <img
+                  src={message.imageUrl}
+                  alt="Generated Chart"
+                  style={{
+                    maxWidth: "100%",
+                    height: "auto",
+                    display: "block",
+                    padding: "10px",
+                    marginBottom: "10px",
+                    borderRadius: "8px",
+                    backgroundColor: "white"
+                  }}
+                />
+                <p style={{ whiteSpace: "pre-wrap" }}>
+                  {message.text}
+                  {loading && index === chatMessages.length - 1 && ".".repeat(loadingMessageIndex + 1)}
+                </p>
+              </div>
+            ) : (
+              <p style={{ whiteSpace: "pre-wrap" }}>
+                {message.text}
+                {loading && index === chatMessages.length - 1 && ".".repeat(loadingMessageIndex + 1)}
+              </p>
+            )}
           </div>
         ))}
       </div>
@@ -78,20 +138,16 @@ function Home() {
           placeholder="กรุณาพิมพ์คำถาม . . ."
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault(); // Prevents adding a new line on Enter
+              e.preventDefault();
               handleChatSubmit();
             }
           }}
           disabled={loading}
-          rows={5} // Adjust the number of visible lines
-          style={{ resize: "none" }} // Prevent manual resizing
+          rows={5}
+          style={{ resize: "none" }}
         />
 
-        <button
-          onClick={handleChatSubmit}
-          disabled={loading}
-          style={{ background: "none", border: "none", cursor: "pointer" }}
-        >
+        <button onClick={handleChatSubmit} disabled={loading} style={{ background: "none", border: "none", cursor: "pointer" }}>
           {loading ? (
             "กำลังคิด..."
           ) : (

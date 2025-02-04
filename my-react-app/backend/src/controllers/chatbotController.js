@@ -12,6 +12,6 @@ exports.chatbotResponse = async (req, res) => {
         res.json(response.data); 
     } catch (error) {
         console.error('Error in chatbotController:', error.response ? error.response.data : error.message);
-        res.status(500).json({ error: 'Failed to fetch chatbot response', details: error.response ? error.response.data : error.message });
+        res.status(500).json({ error: 'ขออภัย แชทบอทเป็นลมระหว่างคิด', details: error.response ? error.response.data : error.message });
     }
 };

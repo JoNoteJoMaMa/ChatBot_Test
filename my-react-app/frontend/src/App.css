@@ -166,18 +166,29 @@ html, body {
   gap: 1rem;
   margin-top: auto; /* Push to the bottom of the navbar */
   padding: 1rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  padding-bottom: 2rem;
   border-top: 1px solid #444; /* Add a separator */
   text-align: center;
 }
 
 .user-info p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   margin: 0;
   color: #000000;
   font-size: 0.9rem;
 }
 
+
 .user-info button {
-  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   padding: 0.5rem 1rem;
   background-color: #ff4d4d; /* Red color for logout button */
   color: white;

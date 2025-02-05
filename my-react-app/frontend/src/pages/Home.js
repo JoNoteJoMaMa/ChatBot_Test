@@ -1,27 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { auth } from "../firebase";
 import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../firebase";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { extractImageAndText, isImageUrlDetect } from "../extractImgLink";
+import { recommendedQuestions } from "../RecommendedQuestions";
 import "./Home.css";
 
-function Home({ userName })  {
+function Home({ userName }) {
   const [sessionId, setSessionId] = useState(""); // Store session ID
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [isSessionStored, setIsSessionStored] = useState(false); // Ensure we update Firestore only once
+  const chatWindowRef = useRef(null); // Create a ref for the chat window
 
   // Generate sessionId & Update URL when user enters `/` page
   useEffect(() => {
     let existingSessionId = new URLSearchParams(window.location.search).get("sessionId");
 
-   
-      existingSessionId = uuidv4();
-      window.history.replaceState({}, "", `/?sessionId=${existingSessionId}`); // Update URL without reloading
+    existingSessionId = uuidv4();
+    window.history.replaceState({}, "", `/?sessionId=${existingSessionId}`); // Update URL without reloading
 
     setSessionId(existingSessionId);
   }, []);
@@ -95,25 +96,32 @@ function Home({ userName })  {
     }
   };
 
+  // Scroll to bottom whenever chatMessages changes
+  useEffect(() => {
+    if (chatWindowRef.current) {
+      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
   return (
     <div className="chat-container">
-      <div className="chat-window">
+      <div className="chat-window" ref={chatWindowRef}>
         {chatMessages.map((message, index) => (
           <div key={index} className={`chat-message ${message.sender}`}>
-            <strong>{message.sender === "user" ? userName+":" : "Bot:"}</strong>
+            <strong>{message.sender === "user" ? userName + ":" : "Bot:"}</strong>
             {message.sender === "bot" && message.imageUrl ? (
               <div>
                 <img
                   src={message.imageUrl}
                   alt="Generated Chart"
                   style={{
-                    maxWidth: "100%",
+                    maxWidth: "65%",
                     height: "auto",
                     display: "block",
                     padding: "10px",
                     marginBottom: "10px",
                     borderRadius: "8px",
-                    backgroundColor: "white"
+                    backgroundColor: "white",
                   }}
                 />
                 <p style={{ whiteSpace: "pre-wrap" }}>
@@ -131,42 +139,60 @@ function Home({ userName })  {
         ))}
       </div>
 
-      <div className="chat-input-container">
-        <textarea
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          placeholder="กรุณาพิมพ์คำถาม . . ."
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              handleChatSubmit();
-            }
-          }}
-          disabled={loading}
-          rows={5}
-          style={{ resize: "none" }}
-        />
-
-        <button onClick={handleChatSubmit} disabled={loading} style={{ background: "none", border: "none", cursor: "pointer" }}>
-          {loading ? (
-            "กำลังคิด..."
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#000000FF"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+      <div className="container-of-chat-area">
+        <div className="text-rec-head">แนะนำคำถาม</div>
+        <div className="rec-question">
+          {recommendedQuestions.map((question, index) => (
+            <div
+              key={index}
+              className="question-box"
+              onClick={() => setChatInput(question)}
             >
-              <path d="M22 2L11 13" />
-              <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-            </svg>
-          )}
-        </button>
+              {question}
+            </div>
+          ))}
+        </div>
+
+        <div className="chat-input-container">
+          <textarea
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            placeholder="กรุณาพิมพ์คำถาม . . ."
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleChatSubmit();
+              }
+            }}
+            disabled={loading}
+            rows={5}
+            style={{ resize: "none" }}
+          />
+          <button
+            onClick={handleChatSubmit}
+            disabled={loading}
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+          >
+            {loading ? (
+              "กำลังคิด..."
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#000000FF"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M22 2L11 13" />
+                <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

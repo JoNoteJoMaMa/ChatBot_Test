@@ -22,7 +22,7 @@
 }
 
 .login-container input {
-  width: 100%;
+  width: 70%;
   padding: 0.75rem;
   margin-bottom: 1rem;
   border: 1px solid #ddd;
@@ -36,10 +36,10 @@
 }
 
 .login-container button {
-  width: 100%;
+  width: 60%;
   padding: 0.75rem;
-  background-color: #007bff; /* Blue button */
-  color: white;
+  background-color: #FFE800; /* Blue button */
+  color: rgb(0, 0, 0);
   border: none;
   border-radius: 5px;
   font-size: 1rem;

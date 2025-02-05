@@ -37,7 +37,7 @@ function Login() {
   return (
     <div className="login-page"> {/* Add a class for the login page */}
       <div className="login-container">
-        <h1>Login</h1>
+        <h1>Chat Bot</h1>
         {error && <p className="error">{error}</p>}
         <form onSubmit={handleLogin}>
           <input

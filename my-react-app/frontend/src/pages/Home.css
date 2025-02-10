@@ -156,7 +156,7 @@
 }
 
 .rec-question::-webkit-scrollbar-thumb:hover {
-    background-color: #999;
+    background-color: #ea3535;
 }
 
 .question-box {
@@ -175,7 +175,7 @@
 }
 
 .question-box:hover {
-    background-color: #fff8ae;
+    background-color: #ec5e5e;
     color: #000;
 }
 

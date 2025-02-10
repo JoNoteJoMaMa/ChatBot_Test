@@ -28,4 +28,19 @@ const extractImageAndText = (text) => {
     };
   };
 
-export { isImageUrlDetect, extractImageAndText };
+  const extractTextOnly = (text) => {
+    const regex = /!\[.*?\]\((https?:\/\/[^\s]+)\)\s*([\s\S]*)/; // Matches markdown image syntax and captures the entire description
+    const match = text.match(regex);
+  
+    if (match) {
+      return {
+        description: match[2].trim(), // Extracted description
+      };
+    }
+  
+    return {
+      description: text.trim(), // If no URL, return the entire text as description
+    };
+  };
+
+export { isImageUrlDetect, extractImageAndText,extractTextOnly };

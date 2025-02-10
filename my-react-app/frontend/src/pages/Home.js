@@ -4,11 +4,11 @@ import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from "../firebase";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { extractImageAndText, isImageUrlDetect } from "../extractImgLink";
+import { extractImageAndText, isImageUrlDetect, extractTextOnly } from "../extractImgLink";
 import { recommendedQuestions } from "../RecommendedQuestions";
 import "./Home.css";
 
-function Home({ userName }) {
+function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
   const [sessionId, setSessionId] = useState(""); // Store session ID
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
@@ -19,13 +19,36 @@ function Home({ userName }) {
 
   // Generate sessionId & Update URL when user enters `/` page
   useEffect(() => {
-    let existingSessionId = new URLSearchParams(window.location.search).get("sessionId");
+    if (!externalSessionId) {
+      let existingSessionId = new URLSearchParams(window.location.search).get("sessionId");
+ 
+        existingSessionId = uuidv4();
+        window.history.replaceState({}, "", `/?sessionId=${existingSessionId}`); // Update URL without reloading
 
-    existingSessionId = uuidv4();
-    window.history.replaceState({}, "", `/?sessionId=${existingSessionId}`); // Update URL without reloading
 
-    setSessionId(existingSessionId);
-  }, []);
+      setSessionId(existingSessionId);
+    } else {
+      setSessionId(externalSessionId);
+      fetchChatHistory(externalSessionId);
+    }
+  }, [externalSessionId]);
+
+  const fetchChatHistory = async (sessionId) => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/chat-history", {
+        params: { sessionId },
+      });
+      const mappedMessages = response.data.messages.map((message) => ({
+        sender: message.message.type === "human" ? "user" : "bot",
+        text: extractTextOnly(message.message.content).description,
+        imageUrl: isImageUrlDetect(message.message.content) ? extractImageAndText(message.message.content).imageUrl : null,
+      }));
+
+      setChatMessages(mappedMessages);
+    } catch (error) {
+      console.error("Error fetching chat history:", error);
+    }
+  };
 
   useEffect(() => {
     if (loading) {
@@ -54,7 +77,6 @@ function Home({ userName }) {
 
   const handleChatSubmit = async () => {
     if (!chatInput.trim()) return;
-
     setLoading(true);
     const userMessage = { sender: "user", text: chatInput };
     setChatMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -81,6 +103,7 @@ function Home({ userName }) {
           index === prevMessages.length - 1 ? botMessage : msg
         )
       );
+      fetchChatHistories()
     } catch (error) {
       console.error("Error in chatbot API call:", error);
       setChatMessages((prevMessages) =>

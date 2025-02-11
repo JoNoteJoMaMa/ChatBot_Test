@@ -203,7 +203,8 @@ useEffect(() => {
       {user && (
         <nav className="navbar">
           <Link className="logo" to="/">
-            Chat Bot
+            Big Data
+            <img src="/NT_Logo.png" alt="Mountain" width="60px" height="35px"/>
           </Link>
           <ul className="nav-links">
             {/* Home Button with Collapsible List */}

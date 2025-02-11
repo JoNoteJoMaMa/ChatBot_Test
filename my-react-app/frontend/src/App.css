@@ -30,8 +30,10 @@ html, body {
   color: #000000;
   padding: 1rem;
   display: flex;
+  justify-content: center;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  align-self: center;
   flex-shrink: 0; /* Prevent the navbar from shrinking */
   height: 100vh; /* Make it span the full height of the viewport */
   position: fixed; /* Fix it to the left side of the screen */
@@ -41,11 +43,18 @@ html, body {
 }
 
 .navbar .logo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.5rem;
   font-size: 1.5rem;
   font-weight: bold;
   text-decoration: none;
   color: #000000;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #444; /* Add a separator */
+  padding-bottom: 10px;
 }
 
 .navbar .nav-links {

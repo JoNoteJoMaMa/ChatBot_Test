@@ -12,35 +12,45 @@ const isImageUrlDetect = (text) =>{
 }
 
 const extractImageAndText = (text) => {
-    const regex = /!\[.*?\]\((https?:\/\/[^\s]+)\)\s*([\s\S]*)/; // Matches markdown image syntax and captures the entire description
-    const match = text.match(regex);
-  
-    if (match) {
-      return {
-        imageUrl: match[1], // Extracted URL
-        description: match[2].trim(), // Extracted description
-      };
-    }
-  
-    return {
-      imageUrl: null,
-      description: text.trim(), // If no URL, return the entire text as description
-    };
-  };
+  const regex = /!\[.*?\]\((https?:\/\/[^\s]+)\)/g; // Global regex to match markdown images
+  const content = [];
+  let lastIndex = 0;
 
-  const extractTextOnly = (text) => {
-    const regex = /!\[.*?\]\((https?:\/\/[^\s]+)\)\s*([\s\S]*)/; // Matches markdown image syntax and captures the entire description
-    const match = text.match(regex);
-  
-    if (match) {
-      return {
-        description: match[2].trim(), // Extracted description
-      };
-    }
-  
-    return {
-      description: text.trim(), // If no URL, return the entire text as description
-    };
-  };
+  // Find all image matches
+  text.replace(regex, (match, imageUrl, offset) => {
+      // Add text before the image
+      if (offset > lastIndex) {
+          content.push({
+              type: 'text',
+              value: text.slice(lastIndex, offset).trim(),
+          });
+      }
 
-export { isImageUrlDetect, extractImageAndText,extractTextOnly };
+      // Add the image
+      content.push({
+          type: 'image',
+          value: imageUrl,
+      });
+
+      // Update the lastIndex to the end of the current match
+      lastIndex = offset + match.length;
+  });
+
+  // Add any remaining text after the last image
+  if (lastIndex < text.length) {
+      content.push({
+          type: 'text',
+          value: text.slice(lastIndex).trim(),
+      });
+  }
+
+  return content;
+};
+
+const extractTextOnly = (text) => {
+  const regex = /!\[.*?\]\((https?:\/\/[^\s]+)\)/g; // Global regex to match all image URLs
+  const textWithoutImages = text.replace(regex, '').trim(); // Remove image markdown
+  return { description: textWithoutImages };
+};
+
+export { isImageUrlDetect, extractImageAndText, extractTextOnly };

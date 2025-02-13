@@ -35,21 +35,23 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
 
   const fetchChatHistory = async (sessionId) => {
     try {
-      const response = await axios.get("http://localhost:5000/api/chat-history", {
-        params: { sessionId },
-      });
-      const mappedMessages = response.data.messages.map((message) => ({
-        sender: message.message.type === "human" ? "user" : "bot",
-        text: extractTextOnly(message.message.content).description,
-        imageUrl: isImageUrlDetect(message.message.content) ? extractImageAndText(message.message.content).imageUrl : null,
-      }));
+        const response = await axios.get("http://localhost:5000/api/chat-history", {
+            params: { sessionId },
+        });
 
-      setChatMessages(mappedMessages);
+        const mappedMessages = response.data.messages.map((message) => {
+            const content = extractImageAndText(message.message.content); // Use extractImageAndText
+            return {
+                sender: message.message.type === "human" ? "user" : "bot",
+                content: content, // Use the content array directly
+            };
+        });
+
+        setChatMessages(mappedMessages);
     } catch (error) {
-      console.error("Error fetching chat history:", error);
+        console.error("Error fetching chat history:", error);
     }
-  };
-
+};
   useEffect(() => {
     if (loading) {
       const interval = setInterval(() => {
@@ -84,40 +86,38 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
     setChatMessages((prevMessages) => [...prevMessages, { sender: "bot", text: "กำลังคิด" }]);
 
     try {
-      // **Store session ID in Firestore ONLY if the user starts a chat**
-      await storeSessionInDB();
+        // **Store session ID in Firestore ONLY if the user starts a chat**
+        await storeSessionInDB();
 
-      const response = await axios.post("http://209.15.111.1:5678/webhook/n8n_Sale2012", {
-        sessionId,
-        chatInput,
-      });
+        const response = await axios.post("http://209.15.111.1:5678/webhook/n8n_Sale2012", {
+            sessionId,
+            chatInput,
+        });
 
-      const { imageUrl, description } = extractImageAndText(response.data.message);
+        const content = extractImageAndText(response.data.message);
 
-      const botMessage = isImageUrlDetect(response.data.message)
-        ? { sender: "bot", text: description, imageUrl }
-        : { sender: "bot", text: response.data.message };
+        const botMessage = { sender: "bot", content };
 
-      setChatMessages((prevMessages) =>
-        prevMessages.map((msg, index) =>
-          index === prevMessages.length - 1 ? botMessage : msg
-        )
-      );
-      fetchChatHistories()
+        setChatMessages((prevMessages) =>
+            prevMessages.map((msg, index) =>
+                index === prevMessages.length - 1 ? botMessage : msg
+            )
+        );
+        fetchChatHistories();
     } catch (error) {
-      console.error("Error in chatbot API call:", error);
-      setChatMessages((prevMessages) =>
-        prevMessages.map((msg, index) =>
-          index === prevMessages.length - 1
-            ? { sender: "bot", text: "Error: Could not fetch response from chatbot." }
-            : msg
-        )
-      );
+        console.error("Error in chatbot API call:", error);
+        setChatMessages((prevMessages) =>
+            prevMessages.map((msg, index) =>
+                index === prevMessages.length - 1
+                    ? { sender: "bot", content: [{ type: 'text', value: 'Error: Could not fetch response from chatbot.' }] }
+                    : msg
+            )
+        );
     } finally {
-      setLoading(false);
-      setChatInput("");
+        setLoading(false);
+        setChatInput("");
     }
-  };
+};
 
   // Scroll to bottom whenever chatMessages changes
   useEffect(() => {
@@ -128,39 +128,47 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
 
   return (
     <div className="chat-container">
-      <div className="chat-window" ref={chatWindowRef}>
-        {chatMessages.map((message, index) => (
-          <div key={index} className={`chat-message ${message.sender}`}>
-            <strong>{message.sender === "user" ? userName + ":" : "Bot:"}</strong>
-            {message.sender === "bot" && message.imageUrl ? (
-              <div>
-                <img
-                  src={message.imageUrl}
-                  alt="Generated Chart"
-                  style={{
-                    maxWidth: "65%",
-                    height: "auto",
-                    display: "block",
-                    padding: "10px",
-                    marginBottom: "10px",
-                    borderRadius: "8px",
-                    backgroundColor: "white",
-                  }}
-                />
-                <p style={{ whiteSpace: "pre-wrap" }}>
-                  {message.text}
-                  {loading && index === chatMessages.length - 1 && ".".repeat(loadingMessageIndex + 1)}
+        <div className="chat-window" ref={chatWindowRef}>
+            {chatMessages.map((message, index) => (
+                <div key={index} className={`chat-message ${message.sender}`}>
+                    <strong>{message.sender === "user" ? userName + ":" : "Bot:"}</strong>
+                    {message.sender === "bot" && message.content ? (
+    <div>
+        {message.content.map((item, idx) =>
+            item.type === 'text' ? (
+                <p key={idx} style={{ whiteSpace: "pre-wrap" }}>
+                    {item.value}
                 </p>
-              </div>
             ) : (
-              <p style={{ whiteSpace: "pre-wrap" }}>
-                {message.text}
-                {loading && index === chatMessages.length - 1 && ".".repeat(loadingMessageIndex + 1)}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
+                <img
+                    key={idx}
+                    src={item.value}
+                    alt="Generated Chart"
+                    style={{
+                        maxWidth: "65%",
+                        height: "auto",
+                        display: "block",
+                        padding: "10px",
+                        marginBottom: "10px",
+                        borderRadius: "8px",
+                        backgroundColor: "white",
+                    }}
+                    onError={(e) => {
+                        console.error("Image failed to load:", item.value);
+                        e.target.style.display = "none"; // Hide broken images
+                    }}
+                />
+            )
+        )}
+    </div>
+) : (
+    <p style={{ whiteSpace: "pre-wrap" }}>
+        {message.text}
+    </p>
+)}
+                </div>
+            ))}
+        </div>
 
       <div className="container-of-chat-area">
         <div className="text-rec-head">แนะนำคำถาม</div>

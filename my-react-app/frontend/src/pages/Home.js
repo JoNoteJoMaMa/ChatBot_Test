@@ -7,8 +7,10 @@ import axios from "axios";
 import { extractImageAndText, isImageUrlDetect, extractTextOnly } from "../extractImgLink";
 import { recommendedQuestions } from "../RecommendedQuestions";
 import "./Home.css";
+import Cookies from "js-cookie"; // Import js-cookie
+import { agents } from "../agents";
 
-function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
+function Home({ userName, sessionId: externalSessionId, fetchChatHistories,selectAgent, setSelectedAgent }) {
   const [sessionId, setSessionId] = useState(""); // Store session ID
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
@@ -16,6 +18,29 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [isSessionStored, setIsSessionStored] = useState(false); // Ensure we update Firestore only once
   const chatWindowRef = useRef(null); // Create a ref for the chat window
+  const [tempSelectedAgent, setTempSelectedAgent] = useState("");
+  const [isModalOpenAgent, setIsModalOpenAgent] = useState(false); // pop-up for confirm delete the history
+    
+
+
+  const chooseAgent = (agentName) => {
+    console.log(`Selected Agent: ${agentName}`);
+    setSelectedAgent(agentName);
+    Cookies.set("selectedAgent", agentName, { expires: 7 }); // Save in cookies for 7 days
+    window.location.reload(); 
+    setIsModalOpenAgent(false);
+  };
+
+  useEffect(() => {
+    // Retrieve the agent from cookies when the component loads
+    const savedAgent = Cookies.get("selectedAgent");
+    if (savedAgent) {
+      setSelectedAgent(savedAgent);
+     
+    }else{
+      setIsModalOpenAgent(true);
+    } 
+  }, []);
 
   // Generate sessionId & Update URL when user enters `/` page
   useEffect(() => {
@@ -40,11 +65,20 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
         });
 
         const mappedMessages = response.data.messages.map((message) => {
-            const content = extractImageAndText(message.message.content); // Use extractImageAndText
-            return {
-                sender: message.message.type === "human" ? "user" : "bot",
-                content: content, // Use the content array directly
-            };
+            if (message.message.type === "human") {
+                // User messages: Treat as plain text
+                return {
+                    sender: "user",
+                    content: [{ type: 'text', value: message.message.content }],
+                };
+            } else {
+                // Bot messages: Process for images and text
+                const content = extractImageAndText(message.message.content);
+                return {
+                    sender: "bot",
+                    content: content,
+                };
+            }
         });
 
         setChatMessages(mappedMessages);
@@ -77,7 +111,7 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
     }
   };
 
-  const handleChatSubmit = async () => {
+  const handleChatSubmit = async (agentName) => {
     if (!chatInput.trim()) return;
     setLoading(true);
     const userMessage = { sender: "user", text: chatInput };
@@ -89,7 +123,7 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
         // **Store session ID in Firestore ONLY if the user starts a chat**
         await storeSessionInDB();
 
-        const response = await axios.post("http://209.15.111.1:5678/webhook/n8n_Sale2012", {
+        const response = await axios.post(`http://209.15.111.1:5678/webhook/${agentName}`, {
             sessionId,
             chatInput,
         });
@@ -132,12 +166,13 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
             {chatMessages.map((message, index) => (
                 <div key={index} className={`chat-message ${message.sender}`}>
                     <strong>{message.sender === "user" ? userName + ":" : "Bot:"}</strong>
-                    {message.sender === "bot" && message.content ? (
+                    {message.content ? (
     <div>
         {message.content.map((item, idx) =>
             item.type === 'text' ? (
                 <p key={idx} style={{ whiteSpace: "pre-wrap" }}>
                     {item.value}
+                    {loading && index === chatMessages.length - 1 && ".".repeat(loadingMessageIndex + 1)}
                 </p>
             ) : (
                 <img
@@ -172,7 +207,7 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
         </div>
 
       <div className="container-of-chat-area">
-        <div className="text-rec-head">แนะนำคำถาม</div>
+        <div className="text-rec-head">แนะนำคำถาม </div>
         <div className="rec-question">
           {recommendedQuestions.map((question, index) => (
             <div
@@ -193,7 +228,7 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                handleChatSubmit();
+                handleChatSubmit(selectAgent);
               }
             }}
             disabled={loading}
@@ -201,7 +236,7 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
             style={{ resize: "none" }}
           />
           <button
-            onClick={handleChatSubmit}
+            onClick={()=>{handleChatSubmit(selectAgent)}}
             disabled={loading}
             style={{ background: "none", border: "none", cursor: "pointer" }}
           >
@@ -226,7 +261,37 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
           </button>
         </div>
       </div>
+      {isModalOpenAgent && (
+  <>
+    <div className="modal-overlay" />
+    <div className="home-modal-container">
+      <div className="home-modal-content">
+        <h3>กรุณาเลือก Agent ที่ต้องการจะถามก่อนใช้งาน</h3>
+        <div className="home-modal-buttons">
+          <select
+            value={tempSelectedAgent}
+            onChange={(e) => setTempSelectedAgent(e.target.value)}
+          >
+            <option value="">เลือก Agent</option>
+            {agents.map((agent, index) => (
+              <option key={index} value={agent}>
+                {agent}
+              </option>
+            ))}
+          </select>
+          <button
+            className="home-modal-button home-confirm-button"
+            onClick={() => {if (tempSelectedAgent !== "") {chooseAgent(tempSelectedAgent)}}}
+          >
+            ยืนยัน
+          </button>
+        </div>
+      </div>
     </div>
+  </>
+)}
+    </div>
+    
   );
 }
 

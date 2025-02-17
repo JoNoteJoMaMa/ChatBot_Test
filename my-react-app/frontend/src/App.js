@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from "react-router-dom";
 import { auth } from "./firebase";
 import { signOut } from "firebase/auth";
@@ -13,6 +13,8 @@ import ProtectedRoute from "./ProtectRoute";
 import Chat from "./pages/Chat";
 import "./App.css";
 import axios from "axios";
+import { agents } from "./agents"
+import Cookies from "js-cookie"; // Import js-cookie
 
 function App() {
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
@@ -25,6 +27,7 @@ function App() {
   const [sessionId, setSessionId] = useState(""); // Track the current session ID
   const [isModalOpenHis, setIsModalOpenHis] = useState(false); // pop-up for confirm delete the history
   const [selectedSessionId, setSelectedSessionId] = useState(null);
+  const [selectAgent, setSelectedAgent] = useState("");
   const navigate = useNavigate();
 
   // Listen for authentication state changes
@@ -69,6 +72,15 @@ useEffect(() => {
     document.body.classList.remove('modal-open');
   };
 }, [isModalOpenHis]);
+
+useEffect(() => {
+  // Retrieve the agent from cookies when the component loads
+  const savedAgent = Cookies.get("selectedAgent");
+  if (savedAgent) {
+    setSelectedAgent(savedAgent);
+  } 
+}, []);
+
 
   // Fetch chat histories for all session IDs of the user
   const fetchChatHistories = async () => {
@@ -116,6 +128,7 @@ useEffect(() => {
       setSelectedSessionId(null);
     }
   };
+
 
   const handleDeleteSession = async (sessionId) => {
     try {
@@ -182,12 +195,19 @@ useEffect(() => {
       alert("Failed to delete session from the database."); // Inform the user of failure
     }
   };
+
+    const chooseAgent = (agentName) => {
+      console.log(`Selected Agent: ${agentName}`);
+      setSelectedAgent(agentName);
+      Cookies.set("selectedAgent", agentName, { expires: 7 }); // Save in cookies for 7 days
+    };
   
 
   // Handle logout
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      document.cookie = "selectedAgent=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -208,7 +228,22 @@ useEffect(() => {
           </Link>
           <ul className="nav-links">
             {/* Home Button with Collapsible List */}
-
+            <li>
+              <div className="nav-item" onClick={() => setIsFreqExpanded(!isFreqExpanded)}>
+                <span> {selectAgent === "" ? "เลือก Agent" : selectAgent}</span>
+                <span className="arrow">{isFreqExpanded ? "▲" : "▼"}</span>
+              </div>
+              {isFreqExpanded && (
+                <ul className="sub-links">
+                 {agents.map((agents, index) => (
+                <li key={index} onClick={() => chooseAgent(agents)}>
+                  {agents}
+                </li>
+              ))}
+                </ul>
+              )}
+            </li> 
+            <li>
             <div className="container-new-chat" onClick={() => goToNewChat()}>
               <div className="new-chat-button"  >
               <svg xmlns="http://www.w3.org/2000/svg" 
@@ -229,7 +264,7 @@ useEffect(() => {
               </div>
  
             <li>
-              <div className="nav-item" onClick={() => setIsMenuExpanded(!isMenuExpanded)}>
+              <div className="nav-item" onClick={() => {setIsMenuExpanded(!isMenuExpanded); setIsHisExpanded(false);}}>
                 <span>เมนู</span>
                 <span className="arrow">{isMenuExpanded ? "▲" : "▼"}</span>
               </div>
@@ -251,24 +286,8 @@ useEffect(() => {
               )}
             </li>
 
-            {/* <li>
-              <div className="nav-item" onClick={() => setIsFreqExpanded(!isFreqExpanded)}>
-                <span>คำถามที่ Chat พบบ่อย</span>
-                <span className="arrow">{isFreqExpanded ? "▲" : "▼"}</span>
-              </div>
-              {isFreqExpanded && (
-                <ul className="sub-links">
-                  <li>
-                    <Link to="/subpage1">Subpage 1</Link>
-                  </li>
-                  <li>
-                    <Link to="/subpage2">Subpage 2</Link>
-                  </li>
-                </ul>
-              )}
-            </li> */}
-            <li>
-              <div className="nav-item" onClick={() => setIsHisExpanded(!isHisExpanded)}>
+         
+              <div className="nav-item" onClick={() => {setIsHisExpanded(!isHisExpanded); setIsMenuExpanded(false)}}>
                 <span>ประวัติการสนทนา</span>
                 <span className="arrow">{isHisExpanded ? "▲" : "▼"}</span>
               </div>
@@ -358,6 +377,8 @@ useEffect(() => {
 
 
 
+
+
         <Routes>
           {/* Login Page (Unprotected) */}
           <Route path="/login" element={<Login />} />
@@ -367,7 +388,15 @@ useEffect(() => {
             path="/"
             element={
               <ProtectedRoute>
-                <Home userName={userName} sessionId={sessionId} fetchChatHistories={fetchChatHistories} />
+                <Home userName={userName} sessionId={sessionId} fetchChatHistories={fetchChatHistories} selectAgent={selectAgent} setSelectedAgent={setSelectedAgent}  />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/welcome"
+            element={
+              <ProtectedRoute>
+                <div>กรุณาเลือก Agent ที่คุณต้องการจะคุยด้วย</div>
               </ProtectedRoute>
             }
           />

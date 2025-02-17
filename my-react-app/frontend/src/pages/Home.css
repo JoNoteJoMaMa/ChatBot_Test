@@ -198,3 +198,104 @@
     font-weight: bold;
     text-align: center;
 }
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+  }
+  
+  /* Modal Container */
+  .home-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 300px;
+    max-width: 90%;
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    z-index: 9999;
+  }
+  
+  /* Modal Content */
+  .home-modal-content {
+    text-align: center;
+  }
+  
+  /* Modal Title */
+  .home-modal-content h3 {
+    margin: 0 0 20px 0;
+    color: #333;
+    font-size: 1.2rem;
+  }
+  
+  /* Modal Buttons Container */
+  .home-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  /* Modal Button Base Styles */
+  .home-modal-button {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  /* Confirm Button */
+  .home-confirm-button {
+    background-color: #dc2626;
+    color: white;
+  }
+  
+  .home-confirm-button:hover {
+    background-color: #b91c1c;
+  }
+  
+  /* Cancel Button */
+  .home-cancel-button {
+    background-color: #e5e7eb;
+    color: #374151;
+  }
+  
+  .home-cancel-button:hover {
+    background-color: #d1d5db;
+  }
+
+  .home-modal-content select {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    color: #374151;
+    font-size: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: border 0.3s ease, box-shadow 0.3s ease;
+    appearance: none; /* Removes default arrow */
+    background-image: url('data:image/svg+xml,%3Csvg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M0.46967 0.46967C0.762563 0.176777 1.23744 0.176777 1.53033 0.46967L5 3.93934L8.46967 0.46967C8.76256 0.176777 9.23744 0.176777 9.53033 0.46967C9.82322 0.762563 9.82322 1.23744 9.53033 1.53033L5.53033 5.53033C5.23744 5.82322 4.76256 5.82322 4.46967 5.53033L0.46967 1.53033C0.176777 1.23744 0.176777 0.762563 0.46967 0.46967Z" fill="%23404145"%3E%3C/path%3E%3C/svg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px;
+  }
+  
+  /* Prevent scrolling when modal is open */
+  body.modal-open {
+    overflow: hidden;
+  }

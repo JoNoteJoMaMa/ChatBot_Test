@@ -269,7 +269,7 @@ useEffect(() => {
             </li> */}
             <li>
               <div className="nav-item" onClick={() => setIsHisExpanded(!isHisExpanded)}>
-                <span>ประวัติการพูดคุย</span>
+                <span>ประวัติการสนทนา</span>
                 <span className="arrow">{isHisExpanded ? "▲" : "▼"}</span>
               </div>
               {isHisExpanded && (

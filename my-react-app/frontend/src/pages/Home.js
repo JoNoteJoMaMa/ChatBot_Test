@@ -164,6 +164,7 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories }) {
 ) : (
     <p style={{ whiteSpace: "pre-wrap" }}>
         {message.text}
+        {loading && index === chatMessages.length - 1 && ".".repeat(loadingMessageIndex + 1)}
     </p>
 )}
                 </div>

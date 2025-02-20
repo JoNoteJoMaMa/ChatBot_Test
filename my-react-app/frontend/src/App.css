@@ -154,6 +154,29 @@ html, body {
   background-color: #ed3939;
 }
 
+.navbar .nav-links li a {
+  /* color: #000000;
+  text-decoration: none;
+  font-size: 1rem;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 5px; */
+}
+
+.agentButton  {
+  color: #000000;
+  text-decoration: none;
+  font-size: 1rem;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+.agentButton:hover{
+  background-color: #ed3939;
+  cursor: pointer;
+}
+
 /* Main Content Area (Right Column) */
 .main-content {
   flex: 1;

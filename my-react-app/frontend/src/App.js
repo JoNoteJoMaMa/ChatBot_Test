@@ -229,21 +229,6 @@ useEffect(() => {
           <ul className="nav-links">
             {/* Home Button with Collapsible List */}
             <li>
-              <div className="nav-item" onClick={() => setIsFreqExpanded(!isFreqExpanded)}>
-                <span> {selectAgent === "" ? "เลือก Agent" : selectAgent}</span>
-                <span className="arrow">{isFreqExpanded ? "▲" : "▼"}</span>
-              </div>
-              {isFreqExpanded && (
-                <ul className="sub-links">
-                 {agents.map((agents, index) => (
-                <li key={index} onClick={() => chooseAgent(agents)}>
-                  {agents}
-                </li>
-              ))}
-                </ul>
-              )}
-            </li> 
-            <li>
             <div className="container-new-chat" onClick={() => goToNewChat()}>
               <div className="new-chat-button"  >
               <svg xmlns="http://www.w3.org/2000/svg" 
@@ -262,9 +247,24 @@ useEffect(() => {
               <h3>แชทใหม่</h3>
               </div>
               </div>
+              <li>
+              <div className="nav-item" onClick={() => {setIsFreqExpanded(!isFreqExpanded); setIsMenuExpanded(false); setIsHisExpanded(false);}}>
+                <span> {selectAgent === "" ? "เลือก Agent" : selectAgent}</span>
+                <span className="arrow">{isFreqExpanded ? "▲" : "▼"}</span>
+              </div>
+              {isFreqExpanded && (
+                <ul className="sub-links">
+                 {agents.map((agents, index) => (
+                <li className="agentButton"key={index} onClick={() => chooseAgent(agents)}>
+                  {agents}
+                </li>
+              ))}
+                </ul>
+              )}
+            </li> 
  
             <li>
-              <div className="nav-item" onClick={() => {setIsMenuExpanded(!isMenuExpanded); setIsHisExpanded(false);}}>
+              <div className="nav-item" onClick={() => {setIsMenuExpanded(!isMenuExpanded); setIsHisExpanded(false); setIsFreqExpanded(false);}}>
                 <span>เมนู</span>
                 <span className="arrow">{isMenuExpanded ? "▲" : "▼"}</span>
               </div>
@@ -287,7 +287,7 @@ useEffect(() => {
             </li>
 
          
-              <div className="nav-item" onClick={() => {setIsHisExpanded(!isHisExpanded); setIsMenuExpanded(false)}}>
+              <div className="nav-item" onClick={() => {setIsHisExpanded(!isHisExpanded); setIsMenuExpanded(false); setIsFreqExpanded(false);}}>
                 <span>ประวัติการสนทนา</span>
                 <span className="arrow">{isHisExpanded ? "▲" : "▼"}</span>
               </div>

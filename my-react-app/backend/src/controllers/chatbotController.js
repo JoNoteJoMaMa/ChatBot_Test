@@ -1,10 +1,14 @@
 const axios = require('axios');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 exports.chatbotResponse = async (req, res) => {
     try {
         const { sessionId, chatInput } = req.body;
-
-        const response = await axios.post('http://209.15.111.1:5678/webhook/invoke_n8n_agent', {
+        const { agentName } = req.params;
+   
+        const response = await axios.post(`${process.env.CHATMODEL_URL}${agentName}`, {
             sessionId,
             chatInput
         });

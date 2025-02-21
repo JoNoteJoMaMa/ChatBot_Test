@@ -92,7 +92,7 @@ useEffect(() => {
         const histories = {};
 
         for (const sessionId of sessionIds) {
-          const response = await axios.get("http://localhost:5000/api/chat-history", {
+          const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}api/getChatHistory`, {
             params: { sessionId },
           });
           histories[sessionId] = response.data;
@@ -133,7 +133,7 @@ useEffect(() => {
   const handleDeleteSession = async (sessionId) => {
     try {
       // Make a DELETE request to delete the session
-      const response = await axios.delete("http://localhost:5000/api/delete-session", {
+      const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}api/deleteHistory`, {
         params: { sessionId },
       });
   

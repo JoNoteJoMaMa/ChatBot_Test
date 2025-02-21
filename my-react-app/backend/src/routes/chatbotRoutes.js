@@ -5,6 +5,6 @@ const router = express.Router();
 const chatbotController = require('../controllers/chatbotController');
 
 // Define the route for handling the chatbot response
-router.post('/chatbot', chatbotController.chatbotResponse);
+router.post('/chatbot/:agentName', chatbotController.chatbotResponse);
 
 module.exports = router;

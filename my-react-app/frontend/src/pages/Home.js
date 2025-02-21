@@ -10,6 +10,7 @@ import "./Home.css";
 import Cookies from "js-cookie"; // Import js-cookie
 import { agents } from "../agents";
 
+
 function Home({ userName, sessionId: externalSessionId, fetchChatHistories,selectAgent, setSelectedAgent }) {
   const [sessionId, setSessionId] = useState(""); // Store session ID
   const [chatInput, setChatInput] = useState("");
@@ -60,7 +61,7 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories,selec
 
   const fetchChatHistory = async (sessionId) => {
     try {
-        const response = await axios.get("http://localhost:5000/api/chat-history", {
+        const response = await axios.get( `${process.env.REACT_APP_BACKEND_URL}api/getChatHistory`, {
             params: { sessionId },
         });
 
@@ -120,10 +121,8 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories,selec
     setChatMessages((prevMessages) => [...prevMessages, { sender: "bot", text: "กำลังคิด" }]);
 
     try {
-        // **Store session ID in Firestore ONLY if the user starts a chat**
-        await storeSessionInDB();
-
-        const response = await axios.post(`http://209.15.111.1:5678/webhook/${agentName}`, {
+        
+        const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}api/chatbot/${agentName}`, {
             sessionId,
             chatInput,
         });
@@ -137,19 +136,23 @@ function Home({ userName, sessionId: externalSessionId, fetchChatHistories,selec
                 index === prevMessages.length - 1 ? botMessage : msg
             )
         );
-        fetchChatHistories();
+        
     } catch (error) {
         console.error("Error in chatbot API call:", error);
         setChatMessages((prevMessages) =>
             prevMessages.map((msg, index) =>
                 index === prevMessages.length - 1
-                    ? { sender: "bot", content: [{ type: 'text', value: 'Error: Could not fetch response from chatbot.' }] }
+                    ? { sender: "bot", content: [{ type: 'text', value: 'Error: ขออภัย แชทบอทเป็นลมระหว่างคิด' }] }
                     : msg
             )
         );
     } finally {
         setLoading(false);
+        
         setChatInput("");
+        // **Store session ID in Firestore ONLY if the user starts a chat**
+        await storeSessionInDB();
+        fetchChatHistories();
     }
 };
 

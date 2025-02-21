@@ -1,15 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const chatbotRoutes = require('./routes/chatbotRoutes');
-
+const dotenv = require('dotenv');
 const app = express();
 
-// Middleware
+// Import routes
+const chatbotRoutes = require('./routes/chatbotRoutes');
+const chatHistoryRoutes = require('./routes/chatHistoryRoutes'); // Import the new route
+
+// Initialize dotenv for environment variables
+dotenv.config();
+
+// Use middlewares
 app.use(cors());
 app.use(bodyParser.json());
 
-// Routes
-app.use('/api/chatbot', chatbotRoutes);
+// Use routes
+app.use('/api', chatbotRoutes);
+app.use('/api', chatHistoryRoutes);
 
 module.exports = app;

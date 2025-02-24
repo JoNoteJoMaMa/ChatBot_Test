@@ -6,162 +6,40 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { extractImageAndText, isImageUrlDetect, extractTextOnly } from "../extractImgLink";
 import { recommendedQuestions } from "../RecommendedQuestions";
-import "./Home.css";
+import "../css/Home.css";
 import Cookies from "js-cookie"; // Import js-cookie
 import { agents } from "../agents";
+import { useHomeController } from "../controllers/useHomeController";
 
 
-function Home({ userName, sessionId: externalSessionId, fetchChatHistories,selectAgent, setSelectedAgent }) {
-  const [sessionId, setSessionId] = useState(""); // Store session ID
-  const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-  const [isSessionStored, setIsSessionStored] = useState(false); // Ensure we update Firestore only once
-  const chatWindowRef = useRef(null); // Create a ref for the chat window
-  const [tempSelectedAgent, setTempSelectedAgent] = useState("");
-  const [isModalOpenAgent, setIsModalOpenAgent] = useState(false); // pop-up for confirm delete the history
+function Home({
+  userName, // Destructure userName from props
+  sessionId: externalSessionId, // Destructure sessionId and rename to externalSessionId
+  fetchChatHistories, // Destructure fetchChatHistories from props
+  selectAgent, // Destructure selectAgent from props
+  setSelectedAgent, // Destructure setSelectedAgent from props
+}) {
+  const {
+    chatInput,
+    setChatInput,
+    chatMessages,
+    loading,
+    chatWindowRef,
+    tempSelectedAgent,
+    setTempSelectedAgent,
+    isModalOpenAgent,
+    handleChatSubmit,
+    chooseAgent,
+    loadingMessageIndex,
     
-
-
-  const chooseAgent = (agentName) => {
-    console.log(`Selected Agent: ${agentName}`);
-    setSelectedAgent(agentName);
-    Cookies.set("selectedAgent", agentName, { expires: 7 }); // Save in cookies for 7 days
-    window.location.reload(); 
-    setIsModalOpenAgent(false);
-  };
-
-  useEffect(() => {
-    // Retrieve the agent from cookies when the component loads
-    const savedAgent = Cookies.get("selectedAgent");
-    if (savedAgent) {
-      setSelectedAgent(savedAgent);
-     
-    }else{
-      setIsModalOpenAgent(true);
-    } 
-  }, []);
-
-  // Generate sessionId & Update URL when user enters `/` page
-  useEffect(() => {
-    if (!externalSessionId) {
-      let existingSessionId = new URLSearchParams(window.location.search).get("sessionId");
- 
-        existingSessionId = uuidv4();
-        window.history.replaceState({}, "", `/?sessionId=${existingSessionId}`); // Update URL without reloading
-
-
-      setSessionId(existingSessionId);
-    } else {
-      setSessionId(externalSessionId);
-      fetchChatHistory(externalSessionId);
-    }
-  }, [externalSessionId]);
-
-  const fetchChatHistory = async (sessionId) => {
-    try {
-        const response = await axios.get( `${process.env.REACT_APP_BACKEND_URL}api/getChatHistory`, {
-            params: { sessionId },
-        });
-
-        const mappedMessages = response.data.messages.map((message) => {
-            if (message.message.type === "human") {
-                // User messages: Treat as plain text
-                return {
-                    sender: "user",
-                    content: [{ type: 'text', value: message.message.content }],
-                };
-            } else {
-                // Bot messages: Process for images and text
-                const content = extractImageAndText(message.message.content);
-                return {
-                    sender: "bot",
-                    content: content,
-                };
-            }
-        });
-
-        setChatMessages(mappedMessages);
-    } catch (error) {
-        console.error("Error fetching chat history:", error);
-    }
-};
-  useEffect(() => {
-    if (loading) {
-      const interval = setInterval(() => {
-        setLoadingMessageIndex((prev) => (prev + 1) % 3);
-      }, 500);
-      return () => clearInterval(interval);
-    }
-  }, [loading]);
-
-  // Function to store sessionId in Firestore (called only when user starts chat)
-  const storeSessionInDB = async () => {
-    if (isSessionStored || !auth.currentUser) return;
-
-    try {
-      const userRef = doc(db, "Users", auth.currentUser.uid);
-      await updateDoc(userRef, {
-        sID: arrayUnion(sessionId),
-      });
-      console.log("Session ID stored successfully!");
-      setIsSessionStored(true); // Prevent duplicate updates
-    } catch (error) {
-      console.error("Error storing session ID:", error);
-    }
-  };
-
-  const handleChatSubmit = async (agentName) => {
-    if (!chatInput.trim()) return;
-    setLoading(true);
-    const userMessage = { sender: "user", text: chatInput };
-    setChatMessages((prevMessages) => [...prevMessages, userMessage]);
-
-    setChatMessages((prevMessages) => [...prevMessages, { sender: "bot", text: "กำลังคิด" }]);
-
-    try {
-        
-        const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}api/chatbot/${agentName}`, {
-            sessionId,
-            chatInput,
-        });
-
-        const content = extractImageAndText(response.data.message);
-
-        const botMessage = { sender: "bot", content };
-
-        setChatMessages((prevMessages) =>
-            prevMessages.map((msg, index) =>
-                index === prevMessages.length - 1 ? botMessage : msg
-            )
-        );
-        
-    } catch (error) {
-        console.error("Error in chatbot API call:", error);
-        setChatMessages((prevMessages) =>
-            prevMessages.map((msg, index) =>
-                index === prevMessages.length - 1
-                    ? { sender: "bot", content: [{ type: 'text', value: 'Error: ขออภัย แชทบอทเป็นลมระหว่างคิด' }] }
-                    : msg
-            )
-        );
-    } finally {
-        setLoading(false);
-        
-        setChatInput("");
-        // **Store session ID in Firestore ONLY if the user starts a chat**
-        await storeSessionInDB();
-        fetchChatHistories();
-    }
-};
-
-  // Scroll to bottom whenever chatMessages changes
-  useEffect(() => {
-    if (chatWindowRef.current) {
-      chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
+  } = useHomeController({
+    userName,
+    sessionId: externalSessionId,
+    fetchChatHistories,
+    selectAgent,
+    setSelectedAgent,
+  });
+  
 
   return (
     <div className="chat-container">

@@ -30,7 +30,7 @@ export const useLoginController = () => {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/"); // Redirect to home page after successful login
     } catch (err) {
-      setError(err.message); // Display error message
+      setError(`ชื่อผู้ใช้หรือรหัสผิดพลาด`); // Display error message with err.message
     }
   };
 

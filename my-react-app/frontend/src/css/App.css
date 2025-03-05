@@ -1,13 +1,4 @@
 General Styles
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
-  color: #ffffff;
-  height: 100%; /* Ensure html and body take full height */
-  overflow: hidden; /* Prevent scrolling on the body */
-}
 
 .container {
   width: 90%;
@@ -48,13 +39,14 @@ html, body {
   justify-content: center;
   align-items: flex-start;
   gap: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.9rem;
   font-weight: bold;
   text-decoration: none;
   color: #000000;
   margin-bottom: 1rem;
   border-bottom: 1px solid #444; /* Add a separator */
   padding-bottom: 10px;
+  font-family: 'NT_Font', sans-serif;
 }
 
 .navbar .nav-links {
@@ -66,6 +58,7 @@ html, body {
 
 .navbar .nav-links li {
   margin-bottom: 1rem;
+  font-family: 'NT_Font', sans-serif;
 }
 
 .navbar .nav-links li a {
@@ -247,7 +240,8 @@ html, body {
   text-align: center;
   margin: 0;
   color: #000000;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-family: 'NT_Font', sans-serif;
 }
 
 
@@ -262,7 +256,8 @@ html, body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
+  font-family: 'NT_Font', sans-serif;
 }
 
 .user-info button:hover {
@@ -278,6 +273,7 @@ html, body {
   width: 100%;
   cursor: pointer;
   background-color: #FFE800;
+  font-family: 'NT_Font', sans-serif;
 }
 
 .session-button:hover {
@@ -346,6 +342,7 @@ html, body {
 .confirm-button {
   background-color: #dc2626;
   color: white;
+  font-family: 'NT_Font', sans-serif;
 }
 
 .confirm-button:hover {
@@ -356,6 +353,7 @@ html, body {
 .cancel-button {
   background-color: #e5e7eb;
   color: #374151;
+  font-family: 'NT_Font', sans-serif;
 }
 
 .cancel-button:hover {
@@ -378,21 +376,27 @@ body.modal-open {
 .container-new-chat{
   display: flex;
   justify-content: center;
+  padding: 0;
 }
 
 /* Button Styles */
 .new-chat-button {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   background-color: #FFE800;
   color: rgb(0, 0, 0);
-  padding: 0.5px 45px;
   margin-bottom: 10px;
   border-radius: 5px;
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 500;
   transition: background-color 0.3s ease, transform 0.2s ease;
+  padding: 10px 45px 10px 45px;
+}
+
+.new-chat-button h3{
+  text-decoration: none;
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 0;
 }
 
 .new-chat-button svg {

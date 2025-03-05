@@ -98,7 +98,7 @@ exports.getHistory =async (req, res) => {
     try {
       const query = `
         SELECT id, session_id, message
-        FROM public.n8n_chat_histories_new
+        FROM public.${process.env.TABLE_HISTORY}
         WHERE session_id = $1
         ORDER BY id ASC;
       `;
@@ -129,7 +129,7 @@ exports.deleteHistory = async (req, res) => {
   try {
     // Delete from chat histories
     const deleteQuery = `
-      DELETE FROM public.n8n_chat_histories_new
+      DELETE FROM public.${process.env.TABLE_HISTORY}
       WHERE session_id = $1;
     `;
     await pool.query(deleteQuery, [sessionId]);

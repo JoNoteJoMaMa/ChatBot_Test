@@ -1,15 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { auth } from "../firebase";
-import { doc, updateDoc, arrayUnion } from "firebase/firestore";
-import { db } from "../firebase";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { extractImageAndText, isImageUrlDetect, extractTextOnly } from "../extractImgLink";
+import { extractImageAndText } from "../extractImgLink";
 import "../css/Home.css";
 import Cookies from "js-cookie"; // Import js-cookie
 
 
-export const useHomeController = ({ userName, sessionId: externalSessionId, fetchChatHistories, selectAgent, setSelectedAgent }) => {
+export const useHomeController = ({ sessionId: externalSessionId, fetchChatHistories, setSelectedAgent }) => {
   const [sessionId, setSessionId] = useState(""); // Store session ID
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
@@ -72,6 +70,7 @@ export const useHomeController = ({ userName, sessionId: externalSessionId, fetc
                 };
             } else {
                 // Bot messages: Process for images and text
+    
                 const content = extractImageAndText(message.message.content);
                 return {
                     sender: "bot",
@@ -127,7 +126,7 @@ const storeNewSession = async () => {
             chatInput,
         });
 
-        const content = extractImageAndText(response.data.message);
+        const content = extractImageAndText(response.data.output);
 
         const botMessage = { sender: "bot", content };
 

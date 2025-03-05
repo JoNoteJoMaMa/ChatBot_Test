@@ -26,7 +26,6 @@ function App() {
     sessionId,
     isModalOpenHis,
     isModalOpenHisDelAlert,
-    setIsModalOpenHisDelAlert,
     selectAgent,
     setSelectedAgent,
     goToNewChat,
@@ -72,7 +71,7 @@ function App() {
                 {isFreqExpanded && (
                   <ul className="sub-links">
                     {agents.map((agent, index) => (
-                      <li className="agentButton" key={index} onClick={() => chooseAgent(agent)}>
+                      <li className="agentButton" key={index} onClick={() => {chooseAgent(agent);window.location.reload();}}>
                         {agent}
                       </li>
                     ))}

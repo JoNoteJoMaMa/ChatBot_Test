@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
-import { doc, getDoc, arrayRemove, updateDoc } from "firebase/firestore";
-import { db } from "../firebase";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -276,7 +274,6 @@ export const useAppController = () => {
     sessionId,
     isModalOpenHis,
     isModalOpenHisDelAlert,
-    setIsModalOpenHisDelAlert,
     selectAgent,
     setSelectedAgent,
     goToNewChat,

@@ -1,8 +1,14 @@
+@font-face {
+  font-family: 'NT_Font';
+  src: url('./fonts/NT_Regular.ttf') format('truetype');
+  /* You can also add a woff2 version for better performance */
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+    sans-serif,;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

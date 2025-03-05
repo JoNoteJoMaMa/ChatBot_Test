@@ -8,7 +8,7 @@
     height: 100vh;
     padding: 50px;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: 'NT_Font', sans-serif;
     position: relative;
 }
 
@@ -89,6 +89,7 @@
     font-size: 16px;
     outline: none;
     border: none;
+    font-family: 'NT_Font', sans-serif;
 }
 
 .chat-input-container button {
@@ -194,9 +195,10 @@
 .text-rec-head{
     margin: 0;
     height: 15px;
-    font-size: 8px;
+    font-size: 1rem;
     font-weight: bold;
     text-align: center;
+    color: white;
 }
 /* Modal Overlay */
 .modal-overlay {
@@ -238,6 +240,7 @@
     margin: 0 0 20px 0;
     color: #333;
     font-size: 1.2rem;
+    font-family: 'NT_Font', sans-serif;
   }
   
   /* Modal Buttons Container */
@@ -246,6 +249,7 @@
     justify-content: center;
     gap: 12px;
     margin-top: 20px;
+    font-family: 'NT_Font', sans-serif;
   }
   
   /* Modal Button Base Styles */
@@ -256,12 +260,14 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    font-family: 'NT_Font', sans-serif;
   }
   
   /* Confirm Button */
   .home-confirm-button {
     background-color: #dc2626;
     color: white;
+    font-family: 'NT_Font', sans-serif;
   }
   
   .home-confirm-button:hover {
@@ -285,7 +291,7 @@
     border-radius: 6px;
     background-color: #f9fafb;
     color: #374151;
-    font-size: 1rem;
+    font-size: 1.2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
     transition: border 0.3s ease, box-shadow 0.3s ease;
     appearance: none; /* Removes default arrow */
@@ -293,6 +299,7 @@
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 12px;
+    font-family: 'NT_Font', sans-serif;
   }
   
   /* Prevent scrolling when modal is open */

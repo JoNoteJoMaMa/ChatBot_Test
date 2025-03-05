@@ -1,13 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { auth } from "../firebase";
-import { doc, updateDoc, arrayUnion } from "firebase/firestore";
-import { db } from "../firebase";
-import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
-import { extractImageAndText, isImageUrlDetect, extractTextOnly } from "../extractImgLink";
+import React from "react";
 import { recommendedQuestions } from "../RecommendedQuestions";
 import "../css/Home.css";
-import Cookies from "js-cookie"; // Import js-cookie
 import { agents } from "../agents";
 import { useHomeController } from "../controllers/useHomeController";
 

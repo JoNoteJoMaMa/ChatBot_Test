@@ -1,4 +1,5 @@
 /* Login.css */
+
 .login-page {
   display: flex;
   justify-content: center;
@@ -19,6 +20,9 @@
 .login-container h1 {
   margin-bottom: 1rem;
   color: #333;
+  font-family: 'NT_Font', sans-serif;
+  font-size: 3rem;
+  margin-top: 0;
 }
 
 .login-container input {
@@ -27,8 +31,9 @@
   margin-bottom: 1rem;
   border: 1px solid #ddd;
   border-radius: 5px;
-  font-size: 1rem;
+  font-size: 1.2rem;
   outline: none;
+  font-family: 'NT_Font', sans-serif;
 }
 
 .login-container input:focus {
@@ -44,6 +49,8 @@
   border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
+  font-family: 'NT_Font', sans-serif;
+  font-size: 1.5rem;
 }
 
 .login-container button:hover {

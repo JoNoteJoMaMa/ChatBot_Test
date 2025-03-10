@@ -11,6 +11,7 @@ function Home({
   fetchChatHistories, // Destructure fetchChatHistories from props
   selectAgent, // Destructure selectAgent from props
   setSelectedAgent, // Destructure setSelectedAgent from props
+  storesession: externalIStoreSession
 }) {
   const {
     chatInput,
@@ -31,6 +32,7 @@ function Home({
     fetchChatHistories,
     selectAgent,
     setSelectedAgent,
+    storesession: externalIStoreSession
   });
   
 

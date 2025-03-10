@@ -12,6 +12,43 @@ const pool = new Pool({
   port: process.env.POSTGRESQL_PORT,
 });
 
+const { v4: uuidv4 } = require('uuid'); 
+
+exports.createNewUser = async (req, res) => {
+  const { userName,userEmail } = req.query;
+  const { userId } = uuidv4();//generate id here;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID is required" });
+  }
+
+  try {
+
+    const createUser = `
+      INSERT INTO users (user_id, username, email, sid)
+      VALUES (
+        $1,  -- Replace with the actual user ID
+        $1,  -- Replace with the actual username
+        $3,  -- Replace with the actual email
+        ARRAY[]::jsonb[]     -- Empty JSONB array
+      )
+      RETURNING *;
+    `;
+
+    const values = [userId,userName,userEmail];
+
+    const result = await pool.query(createUser, values);
+
+    res.json({
+      message: `User created successfully!`,
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 
 // Function to get user details by user_ID
 exports.getUser = async (req, res) => {

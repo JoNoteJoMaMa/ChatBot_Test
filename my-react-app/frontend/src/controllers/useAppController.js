@@ -18,6 +18,7 @@ export const useAppController = () => {
   const [isModalOpenHisDelAlert, setIsModalOpenHisDelAlert] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState(null);
   const [selectAgent, setSelectedAgent] = useState("");
+  const [toStoreSession, setToStoreSession] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -127,6 +128,7 @@ export const useAppController = () => {
 
   const goToNewChat = () => {
     navigate("/");
+    setToStoreSession(true);
     setTimeout(() => {
       window.location.reload();
     }, 1);
@@ -146,7 +148,6 @@ export const useAppController = () => {
   const confirmDelete = async () => {
     if (selectedSessionId) {
       await handleSessionClickDel(selectedSessionId);
-
       setIsModalOpenHis(false);
       setIsModalOpenHisDelAlert(true);
       setSelectedSessionId(null);
@@ -215,6 +216,7 @@ export const useAppController = () => {
   const handleSessionClick = (sessionId) => {
     setSessionId(sessionId);
     navigate(`/?sessionId=${sessionId}`);
+    setToStoreSession(false);
   };
 
   const handleSessionClickDel = async (sessionId) => {
@@ -284,6 +286,7 @@ export const useAppController = () => {
     chooseAgent,
     handleLogout,
     fetchChatHistories,
-    handleFinishedDel
+    handleFinishedDel,
+    toStoreSession
   };
 };

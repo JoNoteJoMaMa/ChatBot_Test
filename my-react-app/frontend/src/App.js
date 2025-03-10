@@ -36,7 +36,8 @@ function App() {
     chooseAgent,
     handleLogout,
     fetchChatHistories,
-    handleFinishedDel
+    handleFinishedDel,
+    toStoreSession
   } = useAppController();
 
   if (loading) {
@@ -151,7 +152,7 @@ function App() {
         )}
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<ProtectedRoute><Home userName={userName} sessionId={sessionId} selectAgent={selectAgent} setSelectedAgent={setSelectedAgent} fetchChatHistories={fetchChatHistories}/></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><Home userName={userName} sessionId={sessionId} selectAgent={selectAgent} setSelectedAgent={setSelectedAgent} fetchChatHistories={fetchChatHistories} storesession={toStoreSession}/></ProtectedRoute>} />
           <Route path="/welcome" element={<ProtectedRoute><div>กรุณาเลือก Agent ที่คุณต้องการจะคุยด้วย</div></ProtectedRoute>} />
           <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
           <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />

@@ -7,7 +7,7 @@ import "../css/Home.css";
 import Cookies from "js-cookie"; // Import js-cookie
 
 
-export const useHomeController = ({ sessionId: externalSessionId, fetchChatHistories, setSelectedAgent }) => {
+export const useHomeController = ({ sessionId: externalSessionId, fetchChatHistories, setSelectedAgent, storesession: externalIStoreSession }) => {
   const [sessionId, setSessionId] = useState(""); // Store session ID
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([]);
@@ -86,7 +86,7 @@ export const useHomeController = ({ sessionId: externalSessionId, fetchChatHisto
 };
 
 const storeNewSession = async () => {
-    if (isSessionStored || !auth.currentUser) return;
+    if (isSessionStored || !auth.currentUser || !externalIStoreSession) return;
     const user_ID = auth.currentUser.uid;
     try {
       const response = await axios.post(

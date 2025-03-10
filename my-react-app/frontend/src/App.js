@@ -49,7 +49,7 @@ function App() {
       {user && (
         <nav className="navbar">
           <Link className="logo" to="/">
-            Big Data
+            Cloud Solution
             <img src="/NT_Logo.png" alt="Mountain" width="60px" height="35px"/>
           </Link>
           <ul className="nav-links">

@@ -135,6 +135,7 @@ export const useAppController = () => {
   };
 
   const openPopUptoDeleteHis = (sessionId) => {
+    setSessionId(sessionId);
     setSelectedSessionId(sessionId);
     setIsModalOpenHis(true);
   };
@@ -237,6 +238,8 @@ export const useAppController = () => {
     try {
       const urlParams = new URLSearchParams(window.location.search);
       const sessionIdFromUrl = urlParams.get("sessionId");
+      console.log(`This is session Id: ${sessionId}`);
+      console.log(`This is session Id from url: ${sessionIdFromUrl}`);
       if (sessionId === sessionIdFromUrl) {
         window.location.reload();
       }

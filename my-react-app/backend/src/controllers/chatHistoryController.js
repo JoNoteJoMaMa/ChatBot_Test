@@ -12,8 +12,6 @@ const pool = new Pool({
   port: process.env.POSTGRESQL_PORT,
 });
 
-const { v4: uuidv4 } = require('uuid'); 
-
 exports.createNewUser = async (req, res) => {
   const { userId,userName,userEmail } = req.query;
 

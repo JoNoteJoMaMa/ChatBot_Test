@@ -54,7 +54,8 @@
 }
 
 .login-container button:hover {
-  background-color: #005bb5; /* Darker blue on hover */
+  background-color: #6cc17e; /* Darker blue on hover */
+  color: rgb(255, 255, 255);
 }
 
 .error {

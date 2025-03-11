@@ -266,13 +266,14 @@
   
   /* Confirm Button */
   .home-confirm-button {
-    background-color: #dc2626;
-    color: white;
+    background-color: #FFE800;
+    color: rgb(0, 0, 0);
     font-family: 'NT_Font', sans-serif;
   }
   
   .home-confirm-button:hover {
-    background-color: #b91c1c;
+    background-color: #6cc17e;
+    color: rgb(255, 255, 255);
   }
   
   /* Cancel Button */

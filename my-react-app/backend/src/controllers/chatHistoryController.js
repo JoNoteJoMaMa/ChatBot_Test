@@ -49,30 +49,23 @@ exports.createNewUser = async (req, res) => {
 
 // Function to get user details by user_ID
 exports.getUser = async (req, res) => {
-  const { user_ID } = req.params; // Extract user_ID from the request parameters
+  const { user_ID } = req.params;
 
   if (!user_ID) {
     return res.status(400).json({ error: 'User ID is required' });
   }
 
   try {
-    // Query the database to find the user by user_ID
-    // const query = `
-    //   SELECT user_ID, userName, userEmail, sID
-    //   FROM public.users
-    //   WHERE user_ID = $1;
-    // `;
+    const query = 'SELECT get_user($1) AS user_data';
     const values = [user_ID];
 
-    const result = await pool.query(`CALL get_user($1, NULL)`, values);
-
-    if (result.rows.length === 0) {
+    const result = await pool.query(query, values);
+    
+    if (!result.rows[0] || !result.rows[0].user_data) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Return the user data
-    const user = result.rows[0];
-    res.status(200).json(user);
+    res.status(200).json(result.rows[0].user_data);
   } catch (error) {
     console.error('Error fetching user:', error);
     res.status(500).json({ error: 'An error occurred while fetching the user' });
@@ -80,7 +73,7 @@ exports.getUser = async (req, res) => {
 };
 
 exports.storeSessionInDB = async (req, res) => {
-  const { user_ID, sessionId } = req.body; // Extract user_ID and sessionID from the request body
+  const { user_ID, sessionId } = req.body;
 
   if (!user_ID || !sessionId) {
     return res.status(400).json({ error: 'User ID and Session ID are required' });
@@ -89,31 +82,24 @@ exports.storeSessionInDB = async (req, res) => {
   try {
     // Create a new session object with the default status of 1
     const newSession = { sessionId, status: 1 };
-
-    // Log the new session object
     console.log('New session object:', newSession);
+    console.log('Received user_ID:', user_ID);
 
-    // Add the new session object to the sID array
-    // const query = `
-    //   UPDATE public.users
-    //   SET sID = array_append(sID, $1::JSONB)
-    //   WHERE user_ID = $2
-    //   RETURNING *;
-    // `;
-    const values = [newSession, user_ID];
-
-    // Log the query and values
-    // console.log('Query:', `CALL store_session_in_db`);
-    // console.log('Values:', values);
-
-    const result = await pool.query(`CALL store_session_in_db($1, $2)`, values);
-
-    if (result.rows.length === 0) {
+    // Correct way to call a stored procedure
+    const query = 'CALL store_session_in_db($1, $2)';
+    const values = [user_ID, sessionId];
+    
+    await pool.query(query, values);
+    
+    // Check if the update was successful by querying the user
+    const checkResult = await pool.query('SELECT * FROM public.users WHERE user_id = $1', [user_ID]);
+    
+    if (checkResult.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
     // Return the updated user data
-    const user = result.rows[0];
+    const user = checkResult.rows[0];
     res.status(200).json({ message: 'Session ID stored successfully!', user });
   } catch (error) {
     console.error('Error storing session ID:', error);
@@ -130,13 +116,20 @@ exports.getHistory = async (req, res) => {
   }
 
   try {
-    // Call the stored procedure and fetch the OUT parameter (chat history)
-    const result = await pool.query(`
-      CALL public.get_history($1, NULL);
-    `, [sessionId]);
+    // Call the function instead of the stored procedure
+    const result = await pool.query('SELECT get_history($1) AS chat_history', [sessionId]);
 
-    // Get the chat history from the procedure's OUT parameter
-    const chatHistory = result.rows[0].p_chat_history;
+    // Get the chat history from the function's return value
+    const chatHistory = result.rows[0].chat_history || [];
+
+    // Handle case where no messages are found
+    if (!chatHistory || chatHistory.length === 0) {
+      return res.json({
+        sessionId,
+        firstQuestion: "No question found",
+        messages: [],
+      });
+    }
 
     // Extract the first question (type: "human") from the chat history
     const firstQuestion = chatHistory.find((row) => row.message.type === "human")?.message.content || "No question found";
@@ -211,15 +204,17 @@ exports.updateSessionStatus = async (req, res) => {
     // WHERE user_id = $2
     // RETURNING *;
     // `;
-    const values = [sessionId, user_ID];
+    const values = [user_ID, sessionId];
 
     // console.log('Query:', `CALL update_session_status($1,$2)`); // Log the query
     // console.log('Values:', values); // Log the values
 
     const result = await pool.query(`CALL update_session_status($1, $2)`, values);
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'User or session not found' });
+    const checkResult = await pool.query('SELECT * FROM users WHERE user_id = $1', [user_ID]);
+    
+    if (checkResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
     // Return the updated user data

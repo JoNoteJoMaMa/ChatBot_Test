@@ -174,7 +174,6 @@ General Styles
 .main-content {
   flex: 1;
   background-color: #59545F; /* Changed to light gray */
-  padding: 2rem;
   height: 100vh; /* Make it take the full viewport height */
   overflow-y: auto; /* Enable scrolling only if content overflows */
 }
